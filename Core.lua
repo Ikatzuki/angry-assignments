@@ -1164,6 +1164,33 @@ local function GetTree_InsertPage(tree, page)
 	end
 end
 
+local function naturalSort(a, b)
+	local function convert(s)
+		if tonumber(s) then
+			return tonumber(s)
+		else
+			return s
+		end
+	end
+
+	local t1, t2 = {}, {}
+	for s in string.gmatch(a.text, "(%d+)%D*") do table.insert(t1, convert(s)) end
+	for s in string.gmatch(b.text, "(%d+)%D*") do table.insert(t2, convert(s)) end
+
+	for i = 1, math.max(#t1, #t2) do
+		if t1[i] and not t2[i] then
+			return true
+		elseif not t1[i] and t2[i] then
+			return false
+		elseif t1[i] < t2[i] then
+			return true
+		elseif t1[i] > t2[i] then
+			return false
+		end
+	end
+	return false
+end
+
 local function GetTree_InsertChildren(categoryId, displayedPages)
 	local tree = {}
 	for _, cat in pairs(AngryAssign_Categories) do
@@ -1179,7 +1206,7 @@ local function GetTree_InsertChildren(categoryId, displayedPages)
 		end
 	end
 
-	table.sort(tree, function(a,b) return a.text < b.text end)
+	table.sort(tree, naturalSort)
 	return tree
 end
 
